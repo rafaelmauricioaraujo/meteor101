@@ -2,24 +2,25 @@ import React, { useState } from "react";
 import { TaskCollection } from "../api/TaskCollections";
 
 function TaskForm() {
-  const [task, setTask] = useState("");
+  const [task, setTask] = useState({});
 
   function createTask(event) {
     event.preventDefault();
-    setTask(event.target.value);
+    const newTask = { text: event.target.value };
+    setTask(newTask);
   }
 
-  function submitForm() {
+  function submitForm(event) {
+    event.preventDefault();
     TaskCollection.insert(task);
     setTask("");
   }
 
   return (
     <form onSubmit={submitForm}>
-      <input type="text" onChange={createTask}>
-        Insert your task here
-      </input>
-      <button type="submit"></button>
+      <label name="newTask">Insert New Task</label>
+      <input name="newTask" type="text" onChange={createTask} />
+      <button type="submit">Create Task</button>
     </form>
   );
 }
