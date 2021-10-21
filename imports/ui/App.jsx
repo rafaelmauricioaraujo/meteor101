@@ -7,7 +7,17 @@ import { Info } from "./Info.jsx";
 import TaskForm from "./TaskForm";
 
 export const App = () => {
-  const tasks = useTracker(() => TaskCollection.find({}).fetch());
+  const tasks = useTracker(() =>
+    TaskCollection.find({}, { sort: { createdAt: -1 } }).fetch()
+  );
+
+  function handlerCheck({ _id, isChecked }) {
+    TaskCollection.update(_id, {
+      $set: {
+        isChecked: !isChecked,
+      },
+    });
+  }
 
   return (
     <div>
@@ -15,7 +25,7 @@ export const App = () => {
       <Hello />
       <ul>
         {tasks.map((task) => (
-          <Task key={task._id} task={task} />
+          <Task key={task._id} task={task} onCheck={handlerCheck} />
         ))}
       </ul>
       <TaskForm />
