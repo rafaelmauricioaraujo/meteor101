@@ -4,6 +4,7 @@ import { TaskCollection } from "../api/TaskCollections";
 import { Task } from "./Task";
 import { Hello } from "./Hello.jsx";
 import { Info } from "./Info.jsx";
+import TaskForm from "./TaskForm";
 
 export const App = () => {
   const tasks = useTracker(() => TaskCollection.find({}).fetch());
@@ -17,6 +18,7 @@ export const App = () => {
           <Task key={task._id} task={task} />
         ))}
       </ul>
+      <TaskForm />
       <Info />
     </div>
   );
