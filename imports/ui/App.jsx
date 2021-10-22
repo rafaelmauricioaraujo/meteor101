@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTracker } from "meteor/react-meteor-data";
 import { TaskCollection } from "../api/TaskCollections";
 import { Task } from "./Task";
@@ -7,8 +7,14 @@ import TaskForm from "./TaskForm";
 import "../../client/main.css";
 
 export const App = () => {
+  const [hideCompleted, setHideCompleted] = useState(false);
+
+  const hideCompletedFilter = { isChecked: { $ne: true } };
+
   const tasks = useTracker(() =>
-    TaskCollection.find({}, { sort: { createdAt: -1 } }).fetch()
+    TaskCollection.find(hideCompleted ? hideCompletedFilter : {}, {
+      sort: { createdAt: -1 },
+    }).fetch()
   );
 
   function handlerCheck({ _id, isChecked }) {
@@ -21,6 +27,10 @@ export const App = () => {
 
   function deleteTask({ _id }) {
     TaskCollection.remove(_id);
+  }
+
+  function handleButton() {
+    setHideCompleted(!hideCompleted);
   }
 
   return (
@@ -46,6 +56,11 @@ export const App = () => {
             />
           ))}
         </ul>
+        <div className="filter">
+          <button onClick={handleButton}>
+            {hideCompleted ? "Show all" : "Hide completed"}
+          </button>
+        </div>
         <Info />
       </div>
     </div>

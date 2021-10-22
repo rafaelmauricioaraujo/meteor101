@@ -15,8 +15,8 @@ function TaskForm() {
   }
 
   return (
-    <form onSubmit={submitForm}>
-      <input
+    <form className="task-form" onSubmit={submitForm}>
+      <input        
         value={task}
         type="text"
         placeholder="Insert New Task"

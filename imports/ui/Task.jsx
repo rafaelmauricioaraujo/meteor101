@@ -20,7 +20,7 @@ export const Task = ({ task, onCheck, deleteTask }) => {
         onClick={_onCheck}
         readOnly
       ></input>
-      {task.text}
+      <span>{task.text}</span>
       <button onClick={_deleteTask}>remove</button>
     </li>
   );
