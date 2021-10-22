@@ -17,10 +17,20 @@ export const App = () => {
     }).fetch()
   );
 
+  const pendingTasksCount = useTracker(() => {
+    TaskCollection.find(hideCompletedFilter).count();
+  });
+
+  console.log(pendingTasksCount);
+
+  const pendingTaskTitle = `${
+    pendingTasksCount ? ` (${pendingTasksCount})` : ""
+  }`;
+
   function handlerCheck({ _id, isChecked }) {
     TaskCollection.update(_id, {
       $set: {
-        isChecked: !isChecked,
+        isChecked: isChecked,
       },
     });
   }
@@ -38,7 +48,7 @@ export const App = () => {
       <header>
         <div className="app-bar">
           <div className="app-header">
-            <h1>📝️ To Do List</h1>
+            <h1>📝️ To Do List {pendingTaskTitle}</h1>
           </div>
         </div>
       </header>
