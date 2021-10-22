@@ -2,9 +2,9 @@ import React from "react";
 import { useTracker } from "meteor/react-meteor-data";
 import { TaskCollection } from "../api/TaskCollections";
 import { Task } from "./Task";
-import { Hello } from "./Hello.jsx";
 import { Info } from "./Info.jsx";
 import TaskForm from "./TaskForm";
+import "../../client/main.css";
 
 export const App = () => {
   const tasks = useTracker(() =>
@@ -19,26 +19,35 @@ export const App = () => {
     });
   }
 
-  function deleteTask({_id}){
+  function deleteTask({ _id }) {
     TaskCollection.remove(_id);
   }
 
   return (
-    <div>
-      <h1>Welcome to Meteor!</h1>
-      <Hello />
-      <ul>
-        {tasks.map((task) => (
-          <Task
-            key={task._id}
-            task={task}
-            onCheck={handlerCheck}
-            deleteTask={deleteTask}
-          />
-        ))}
-      </ul>
-      <TaskForm />
-      <Info />
+    <div className="app">
+      <header>
+        <div className="app-bar">
+          <div className="app-header">
+            <h1>📝️ To Do List</h1>
+          </div>
+        </div>
+      </header>
+
+      <div className="main">
+        <TaskForm />
+
+        <ul className="tasks">
+          {tasks.map((task) => (
+            <Task
+              key={task._id}
+              task={task}
+              onCheck={handlerCheck}
+              deleteTask={deleteTask}
+            />
+          ))}
+        </ul>
+        <Info />
+      </div>
     </div>
   );
 };
