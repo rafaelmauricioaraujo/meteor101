@@ -21,8 +21,6 @@ export const App = () => {
     TaskCollection.find(hideCompletedFilter).count();
   });
 
-  console.log(pendingTasksCount);
-
   const pendingTaskTitle = `${
     pendingTasksCount ? ` (${pendingTasksCount})` : ""
   }`;
