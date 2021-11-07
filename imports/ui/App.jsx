@@ -9,79 +9,96 @@ import LoginForm from "./LoginForm";
 import "../../client/main.css";
 
 export const App = () => {
-    const user = useTracker(() => Meteor.user());
-    console.log("user: ", user);
+  const user = useTracker(() => Meteor.user());
 
-    const [hideCompleted, setHideCompleted] = useState(false);
+  const [hideCompleted, setHideCompleted] = useState(false);
 
-    const hideCompletedFilter = { isChecked: { $ne: true } };
+  const hideCompletedFilter = { isChecked: { $ne: true } };
 
-    const tasks = useTracker(() =>
-        TaskCollection.find(hideCompleted ? hideCompletedFilter : {}, {
-            sort: { createdAt: -1 },
-        }).fetch()
-    );
+  const userFilter = user ? { userId: user._id } : {};
 
-    const pendingTasksCount = useTracker(() => {
-        TaskCollection.find(hideCompletedFilter).count();
+  const pendingOnlyFiler = { ...hideCompleted, ...userFilter };
+
+  const tasks = useTracker(() => {
+    if (!user) {
+      return [];
+    }
+    return TaskCollection.find(hideCompleted ? pendingOnlyFiler : userFilter, {
+      sort: { createdAt: -1 },
+    }).fetch();
+  });
+
+  const pendingTasksCount = useTracker(() => {
+    if (!user) {
+      return 0;
+    }
+
+    TaskCollection.find(pendingOnlyFiler).count();
+  });
+
+  const pendingTaskTitle = `${
+    pendingTasksCount ? ` (${pendingTasksCount})` : ""
+  }`;
+
+  function handlerCheck({ _id, isChecked }) {
+    TaskCollection.update(_id, {
+      $set: {
+        isChecked: isChecked,
+      },
     });
+  }
 
-    const pendingTaskTitle = `${
-        pendingTasksCount ? ` (${pendingTasksCount})` : ""
-    }`;
+  function deleteTask({ _id }) {
+    TaskCollection.remove(_id);
+  }
 
-    function handlerCheck({ _id, isChecked }) {
-        TaskCollection.update(_id, {
-            $set: {
-                isChecked: isChecked,
-            },
-        });
-    }
+  function handleButton() {
+    setHideCompleted(!hideCompleted);
+  }
 
-    function deleteTask({ _id }) {
-        TaskCollection.remove(_id);
-    }
+  function logout() {
+    Meteor.logout();
+  }
 
-    function handleButton() {
-        setHideCompleted(!hideCompleted);
-    }
+  return (
+    <div className="main">
+      {user ? (
+        <Fragment>
+          <div className="user" onClick={logout}>
+            {user.username}
+          </div>
+          <header>
+            <div className="app-bar">
+              <div className="app-header">
+                <h1>📝️ To Do List {pendingTaskTitle}</h1>
+              </div>
+            </div>
+          </header>
 
-    return (
-        <div className="main">
-            {user ? (
-                <Fragment>
-                    <header>
-                        <div className="app-bar">
-                            <div className="app-header">
-                                <h1>📝️ To Do List {pendingTaskTitle}</h1>
-                            </div>
-                        </div>
-                    </header>
+          <div className="main">
+            <TaskForm user={user} />
 
-                    <div className="main">
-                        <TaskForm />
-
-                        <ul className="tasks">
-                            {tasks.map((task) => (
-                                <Task
-                                    key={task._id}
-                                    task={task}
-                                    onCheck={handlerCheck}
-                                    deleteTask={deleteTask}
-                                />
-                            ))}
-                        </ul>
-                        <div className="filter">
-                            <button onClick={handleButton}>
-                                {hideCompleted ? "Show all" : "Hide completed"}
-                            </button>
-                        </div>
-                        <Info />
-                    </div>
-                </Fragment>
-            ) : (
-                <LoginForm />
-            )}
-        </div>
-    );
+            <ul className="tasks">
+              {tasks.map((task) => (
+                <Task
+                  key={task._id}
+                  task={task}
+                  onCheck={handlerCheck}
+                  deleteTask={deleteTask}
+                />
+              ))}
+            </ul>
+            <div className="filter">
+              <button onClick={handleButton}>
+                {hideCompleted ? "Show all" : "Hide completed"}
+              </button>
+            </div>
+            <Info />
+          </div>
+        </Fragment>
+      ) : (
+        <LoginForm />
+      )}
+    </div>
+  );
 };

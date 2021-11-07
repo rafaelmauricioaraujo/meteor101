@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TaskCollection } from "../api/TaskCollections";
 
-function TaskForm() {
+function TaskForm({ user }) {
   const [task, setTask] = useState("");
 
   function createTask(event) {
@@ -10,13 +10,17 @@ function TaskForm() {
 
   function submitForm(event) {
     event.preventDefault();
-    TaskCollection.insert({ text: task });
+    TaskCollection.insert({
+      text: task.trim(),
+      createdAt: new Date(),
+      userId: user._id,
+    });
     setTask("");
   }
 
   return (
     <form className="task-form" onSubmit={submitForm}>
-      <input        
+      <input
         value={task}
         type="text"
         placeholder="Insert New Task"
